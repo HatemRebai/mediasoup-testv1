@@ -21,7 +21,7 @@ gulp.task('lint', () =>
 	[
 		'gulpfile.js',
 		'server.js',
-		'config.example.js',
+		'config.js',
 		'lib/**/*.js'
 	];
 

@@ -11,7 +11,7 @@ console.log('config.js:\n%s', JSON.stringify(config, null, '  '));
 /* eslint-enable no-console */
 
 const fs = require('fs');
-const https = require('https');
+const http = require('http');
 const url = require('url');
 const protoo = require('protoo-server');
 const mediasoup = require('mediasoup');
@@ -35,7 +35,7 @@ const rooms = new Map();
 
 // HTTPS server.
 // @type {https.Server}
-let httpsServer;
+let httpServer;
 
 // Express application.
 // @type {Function}
@@ -70,8 +70,8 @@ async function run()
 	// Create Express app.
 	await createExpressApp();
 
-	// Run HTTPS server.
-	await runHttpsServer();
+	// Run HTTP server.
+	await runHttpServer();
 
 	// Run a protoo WebSocketServer.
 	await runProtooWebSocketServer();
@@ -359,23 +359,23 @@ async function createExpressApp()
  * Create a Node.js HTTPS server. It listens in the IP and port given in the
  * configuration file and reuses the Express application as request listener.
  */
-async function runHttpsServer()
+async function runHttpServer()
 {
-	logger.info('running an HTTPS server...');
+	logger.info('running an HTTP server...');
 
 	// HTTPS server for the protoo WebSocket server.
-	const tls =
-	{
-		cert : fs.readFileSync(config.https.tls.cert),
-		key  : fs.readFileSync(config.https.tls.key)
-	};
+	//const tls =
+	//{
+	//	cert : fs.readFileSync(config.https.tls.cert),
+	//	key  : fs.readFileSync(config.https.tls.key)
+	//};
 
-	httpsServer = https.createServer(tls, expressApp);
+	httpServer = http.createServer(expressApp);
 
 	await new Promise((resolve) =>
 	{
-		httpsServer.listen(
-			Number(config.https.listenPort), config.https.listenIp, resolve);
+		httpServer.listen(
+			Number(config.http.listenPort), config.http.listenIp, resolve);
 	});
 }
 
@@ -387,7 +387,7 @@ async function runProtooWebSocketServer()
 	logger.info('running protoo WebSocketServer...');
 
 	// Create the protoo WebSocket server.
-	protooWebSocketServer = new protoo.WebSocketServer(httpsServer,
+	protooWebSocketServer = new protoo.WebSocketServer(httpServer,
 		{
 			maxReceivedFrameSize     : 960000, // 960 KBytes.
 			maxReceivedMessageSize   : 960000,
